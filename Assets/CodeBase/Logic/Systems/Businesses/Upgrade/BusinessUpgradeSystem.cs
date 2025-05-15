@@ -1,0 +1,60 @@
+using CodeBase.Data.Runtime.ECS.Components.Parameters;
+using CodeBase.Logic.Formulas.Business;
+using CodeBase.Logic.Providers.Data.Balance;
+using CodeBase.Logic.Services.ECS;
+using Leopotam.EcsLite;
+
+namespace CodeBase.Logic.Systems.Businesses
+{
+    public class BusinessUpgradeSystem : IBusinessUpgradeSystem
+    {
+        private readonly IBusinessFormulas _businessFormulas;
+        
+        private readonly EcsPool<LevelParameters> _levelParametersPool;
+        private readonly EcsPool<IncomeParameters> _incomeParametersPool;
+        private readonly EcsPool<CostParameter> _costParametersPool;
+        private readonly IBalanceDataProvider _balanceDataProvider;
+
+        public BusinessUpgradeSystem(
+            IEcsService ecsService, 
+            IBusinessFormulas  businessFormulas,
+            IBalanceDataProvider balanceDataProvider)
+        {
+            _balanceDataProvider = balanceDataProvider;
+            _businessFormulas = businessFormulas;
+            
+            _levelParametersPool = ecsService.GetPool<LevelParameters>();
+            _incomeParametersPool = ecsService.GetPool<IncomeParameters>();
+            _costParametersPool = ecsService.GetPool<CostParameter>();
+        }
+        
+        public bool TryUpgradeLevel(int entity)
+        {
+            ref LevelParameters businessParameters = ref _levelParametersPool.Get(entity);
+
+            if (_balanceDataProvider.Has(businessParameters.UpgradeCost.Value) == false)
+            {
+                return false;
+            }
+            
+            SetLevel(entity, businessParameters.Level.Value + 1);
+            _balanceDataProvider.Take(businessParameters.UpgradeCost.Value);
+            
+            return true;
+        }
+
+        public void SetLevel(int entity, int level)
+        {
+            ref LevelParameters businessParameters = ref _levelParametersPool.Get(entity);
+            businessParameters.Level.Value = level;
+            
+            var businessCost = _costParametersPool.Get(entity).Cost.Value;
+            
+            businessParameters.UpgradeCost.Value = _businessFormulas.GetUpgradeLevelCost(
+                businessParameters.Level.Value, businessCost);
+            
+            ref IncomeParameters incomeParameters = ref _incomeParametersPool.Get(entity);
+            incomeParameters.CurrentIncome.Value = _businessFormulas.GetIncome(entity);
+        }
+    }
+}

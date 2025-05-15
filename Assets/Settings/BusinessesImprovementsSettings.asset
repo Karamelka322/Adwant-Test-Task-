@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f81b59af6ea4cc1bc1aa48d1556be88, type: 3}
+  m_Name: BusinessesImprovementsSettings
+  m_EditorClassIdentifier: 
+  _business:
+  - BusinessType: 0
+    FirstImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 1"
+      Id: income_buff_1
+      Cost: 50
+      Multiplier: 0.5
+    SecondImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 2"
+      Id: income_buff_2
+      Cost: 400
+      Multiplier: 1
+  - BusinessType: 1
+    FirstImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 1"
+      Id: income_buff_1
+      Cost: 1200
+      Multiplier: 1
+    SecondImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 2"
+      Id: income_buff_2
+      Cost: 4000
+      Multiplier: 2
+  - BusinessType: 2
+    FirstImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 1"
+      Id: income_buff_1
+      Cost: 6000
+      Multiplier: 1
+    SecondImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 2"
+      Id: income_buff_2
+      Cost: 20000
+      Multiplier: 1.5
+  - BusinessType: 3
+    FirstImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 1"
+      Id: income_buff_1
+      Cost: 15000
+      Multiplier: 1
+    SecondImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 2"
+      Id: income_buff_2
+      Cost: 50000
+      Multiplier: 2
+  - BusinessType: 4
+    FirstImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 1"
+      Id: income_buff_1
+      Cost: 100000
+      Multiplier: 2
+    SecondImprovement:
+      Name: "\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 2"
+      Id: income_buff_2
+      Cost: 500000
+      Multiplier: 4

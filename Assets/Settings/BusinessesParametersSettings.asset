@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e07dd987954cbeb7252d6f9956f4ad, type: 3}
+  m_Name: BusinessesParametersSettings
+  m_EditorClassIdentifier: 
+  _business:
+  - Type: 0
+    StartLevel: 1
+    Cost: 3
+    Income: 3
+    DelayedIncomeTime: 3
+  - Type: 1
+    StartLevel: 0
+    Cost: 40
+    Income: 40
+    DelayedIncomeTime: 6
+  - Type: 2
+    StartLevel: 0
+    Cost: 200
+    Income: 200
+    DelayedIncomeTime: 10
+  - Type: 3
+    StartLevel: 0
+    Cost: 1000
+    Income: 1000
+    DelayedIncomeTime: 17
+  - Type: 4
+    StartLevel: 0
+    Cost: 5000
+    Income: 5000
+    DelayedIncomeTime: 30
