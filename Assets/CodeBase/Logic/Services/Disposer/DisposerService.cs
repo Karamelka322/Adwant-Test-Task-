@@ -1,43 +1,38 @@
 using System;
-using System.Collections.Generic;
+using CodeBase.Logic.Infrastructure;
+using CodeBase.Logic.Infrastructure.Container;
+using CodeBase.Logic.Unity.Notifiers;
 using UnityEngine;
 
 namespace CodeBase.Logic.Services.Disposer
 {
-    public class DisposerService : IDisposerService
+    public class DisposerService
     {
-        private readonly List<IDisposable> _disposables = new List<IDisposable>();
+        private readonly IServiceLocator _serviceLocator;
+        private readonly ObjectDestroyNotifier _notifier;
 
-        private readonly DestroyObserver _observer;
-        
-        public DisposerService()
+        public DisposerService(IServiceLocator serviceLocator)
         {
-            _observer = CreateObserver();
+            _serviceLocator = serviceLocator;
+            _notifier = CreateObserver();
             
-            _observer.OnObjectDestroy += OnDestroy;
+            _notifier.Destroying += HandleDestroying;
         }
         
-        public void Register(IDisposable disposable)
+        private void HandleDestroying()
         {
-            _disposables.Add(disposable);
-        }
-        
-        private void OnDestroy()
-        {
-            _observer.OnObjectDestroy -= OnDestroy;
+            _notifier.Destroying -= HandleDestroying;
 
-            foreach (var disposable in _disposables)
+            foreach (var disposable in _serviceLocator.GetAll<IDisposable>())
             {
                 disposable.Dispose();
             }
-            
-            _disposables.Clear();
         }
 
-        private DestroyObserver CreateObserver()
+        private ObjectDestroyNotifier CreateObserver()
         {
             var gameObject = new GameObject("DestroyObserver");
-            return gameObject.AddComponent<DestroyObserver>();
+            return gameObject.AddComponent<ObjectDestroyNotifier>();
         }
     }
 }

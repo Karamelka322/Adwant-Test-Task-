@@ -1,16 +1,17 @@
 using System;
 using System.Text;
-using CodeBase.Data.Runtime.ECS.Components.Parameters;
+using CodeBase.Data.Runtime.ECS.Components.Buffs;
+using CodeBase.Data.Static.Models;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Providers.Data.Balance;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
-using CodeBase.Logic.Systems.Businesses;
+using CodeBase.Logic.Systems.Businesses.Buffs;
 using Leopotam.EcsLite;
 using TMPro;
 using UniRx;
 using UnityEngine.UI;
 
-namespace CodeBase.UI.Elements.Business
+namespace CodeBase.UI.Elements.Business.Components
 {
     public class BusinessIncomeBuffButton : IDisposable
     {
@@ -31,28 +32,22 @@ namespace CodeBase.UI.Elements.Business
          public BusinessIncomeBuffButton(
              Button button,
              TextMeshProUGUI buttonText,
-             string name,
-             string id,
-             int cost,
-             float multiplier,
-             IEcsService ecsService,
+             IncomeImprovementConfig config,
              EcsPackedEntity ecsPackedEntity,
-             IBusinessBuffSystem businessBuffSystem,
-             IBalanceDataProvider balanceDataProvider,
-             IDisposerService disposerService)
+             IServiceLocator serviceLocator)
          {
-             _balanceDataProvider = balanceDataProvider;
-             _id = id;
+             _balanceDataProvider = serviceLocator.Get<IBalanceDataProvider>();
+             _ecsService = serviceLocator.Get<IEcsService>();
+             _businessBuffSystem = serviceLocator.Get<IBusinessBuffSystem>();
+             
+             _id = config.Id;
              _ecsPackedEntity = ecsPackedEntity;
-             _ecsService = ecsService;
-             _businessBuffSystem = businessBuffSystem;
-             _multiplier = multiplier;
-             _cost = cost;
+             _multiplier = config.Multiplier;
+             _cost = config.Cost;
              _buttonText = buttonText;
-             _name = name;
+             _name = config.Name;
 
              _stringBuilder = new StringBuilder();
-             disposerService.Register(this);
 
              int entity = _ecsService.UnpackEntity(ecsPackedEntity);
              _disposable = _ecsService.GetPool<IncomeBuffs>().Get(entity).Buffs.ObserveAdd().Subscribe(OnAddBuff);

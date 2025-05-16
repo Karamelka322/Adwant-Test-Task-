@@ -1,4 +1,7 @@
 using System.Threading.Tasks;
+using CodeBase.Logic.Infrastructure;
+using CodeBase.Logic.Infrastructure.Container;
+using CodeBase.Logic.Systems.SaveLoad;
 using CodeBase.UI.Windows.Main;
 using UnityEngine;
 
@@ -8,11 +11,11 @@ namespace CodeBase.Logic.Systems
     {
         private readonly IMainWindow _mainWindow;
         private readonly IPlayerProgressDataLoader _playerProgressDataLoader;
-
-        public MainSceneLoader(IMainWindow mainWindow, IPlayerProgressDataLoader playerProgressDataLoader)
+        
+        public MainSceneLoader(IServiceLocator serviceLocator)
         {
-            _mainWindow = mainWindow;
-            _playerProgressDataLoader = playerProgressDataLoader;
+            _mainWindow = serviceLocator.Get<IMainWindow>();
+            _playerProgressDataLoader = serviceLocator.Get<IPlayerProgressDataLoader>();
             
             LoadAsync().ContinueWith(t =>
             {

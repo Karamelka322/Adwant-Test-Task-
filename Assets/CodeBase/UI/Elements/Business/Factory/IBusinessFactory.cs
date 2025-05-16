@@ -6,6 +6,6 @@ namespace CodeBase.UI.Elements.Business.Factory
 {
     public interface IBusinessFactory
     {
-        Task SpawnAsync(BusinessType businessType, Transform parent);
+        Task<BusinessReferences> SpawnAsync(BusinessType businessType, Transform parent);
     }
 }

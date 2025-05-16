@@ -2,12 +2,14 @@ using CodeBase.Data.Runtime.ECS.Components.Parameters;
 using CodeBase.Data.Runtime.ECS.Components.Tags;
 using CodeBase.Data.Save;
 using CodeBase.Data.Static.Enums;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Providers.Data.Balance;
 using CodeBase.Logic.Providers.Data.Saves;
 using CodeBase.Logic.Services.ECS;
-using CodeBase.Logic.Systems.Businesses;
+using CodeBase.Logic.Systems.Businesses.Buffs;
+using CodeBase.Logic.Systems.Businesses.Upgrade;
 
-namespace CodeBase.Logic.Systems
+namespace CodeBase.Logic.Systems.SaveLoad
 {
     public class PlayerProgressDataLoader : IPlayerProgressDataLoader
     {
@@ -17,18 +19,13 @@ namespace CodeBase.Logic.Systems
         private readonly IBusinessUpgradeSystem _businessUpgradeSystem;
         private readonly IBusinessBuffSystem _businessBuffSystem;
 
-        public PlayerProgressDataLoader(
-            IPlayerProgressDataProvider playerProgressDataProvider,
-            IEcsService ecsService,
-            IBusinessBuffSystem businessBuffSystem,
-            IBusinessUpgradeSystem businessUpgradeSystem,
-            IBalanceDataProvider balanceDataProvider)
+        public PlayerProgressDataLoader(IServiceLocator serviceLocator)
         {
-            _businessBuffSystem = businessBuffSystem;
-            _businessUpgradeSystem = businessUpgradeSystem;
-            _ecsService = ecsService;
-            _balanceDataProvider = balanceDataProvider;
-            _playerProgressDataProvider = playerProgressDataProvider;
+            _businessBuffSystem = serviceLocator.Get<IBusinessBuffSystem>();
+            _businessUpgradeSystem = serviceLocator.Get<IBusinessUpgradeSystem>();
+            _ecsService = serviceLocator.Get<IEcsService>();
+            _balanceDataProvider = serviceLocator.Get<IBalanceDataProvider>();
+            _playerProgressDataProvider = serviceLocator.Get<IPlayerProgressDataProvider>();
         }
 
         public void Load()

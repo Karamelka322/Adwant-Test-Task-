@@ -1,4 +1,4 @@
-namespace CodeBase.Logic.Systems.Businesses
+namespace CodeBase.Logic.Systems.Businesses.Upgrade
 {
     public interface IBusinessUpgradeSystem
     {

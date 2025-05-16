@@ -28,7 +28,7 @@ namespace CodeBase.Logic.Services.ECS
 
         public int UnpackEntity(EcsPackedEntity packedEntity)
         {
-            var isUnpacked = packedEntity.Unpack(_ecsWorld, out var entity);
+            bool isUnpacked = packedEntity.Unpack(_ecsWorld, out var entity);
 
             if (isUnpacked)
             {

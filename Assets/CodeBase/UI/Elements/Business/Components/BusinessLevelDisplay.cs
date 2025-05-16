@@ -1,13 +1,12 @@
 using System;
 using System.Text;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
 using Leopotam.EcsLite;
 using TMPro;
 using UniRx;
 
-namespace CodeBase.UI.Elements.Business
+namespace CodeBase.UI.Elements.Business.Components
 {
     public class BusinessLevelDisplay : IDisposable
     {
@@ -19,17 +18,15 @@ namespace CodeBase.UI.Elements.Business
         public BusinessLevelDisplay(
             TextMeshProUGUI levelDisplay,
             IEcsService ecsService,
-            EcsPackedEntity ecsPackedEntity,
-            IDisposerService disposerService)
+            EcsPackedEntity ecsPackedEntity)
         {
             _levelDisplay = levelDisplay;
             _ecsService = ecsService;
 
             _stringBuilder = new StringBuilder();
-            disposerService.Register(this);
 
-            var entity = _ecsService.UnpackEntity(ecsPackedEntity);
-            var leve = GetLevel(entity);
+            int entity = _ecsService.UnpackEntity(ecsPackedEntity);
+            int leve = GetLevel(entity);
             
             SetText(leve);
             

@@ -1,15 +1,14 @@
 using System;
 using System.Text;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
-using CodeBase.Logic.Systems.Businesses;
+using CodeBase.Logic.Systems.Businesses.Upgrade;
 using Leopotam.EcsLite;
 using TMPro;
 using UniRx;
 using UnityEngine.UI;
 
-namespace CodeBase.UI.Elements.Business
+namespace CodeBase.UI.Elements.Business.Components
 {
     public class BusinessLevelUpgradeButton : IDisposable
     {
@@ -26,8 +25,7 @@ namespace CodeBase.UI.Elements.Business
             TextMeshProUGUI buttonText,
             IEcsService ecsService,
             EcsPackedEntity ecsPackedEntity,
-            IBusinessUpgradeSystem businessUpgradeSystem, 
-            IDisposerService disposerService)
+            IBusinessUpgradeSystem businessUpgradeSystem)
         {
             _buttonText = buttonText;
             _businessUpgradeSystem = businessUpgradeSystem;
@@ -35,10 +33,9 @@ namespace CodeBase.UI.Elements.Business
             _ecsPackedEntity = ecsPackedEntity;
             
             _stringBuilder = new StringBuilder();
-            disposerService.Register(this);
             
             int entity = ecsService.UnpackEntity(ecsPackedEntity);
-            var levelParameters = _ecsService.GetPool<LevelParameters>().Get(entity);
+            LevelParameters levelParameters = _ecsService.GetPool<LevelParameters>().Get(entity);
             
             _disposable = levelParameters.UpgradeCost.Subscribe(OnUpgradeCost);
 

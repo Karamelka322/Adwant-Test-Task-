@@ -1,4 +1,4 @@
-namespace CodeBase.Logic.Systems
+namespace CodeBase.Logic.Systems.SaveLoad
 {
     public interface IPlayerProgressDataLoader
     {

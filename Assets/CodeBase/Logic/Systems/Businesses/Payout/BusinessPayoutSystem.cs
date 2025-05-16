@@ -1,14 +1,14 @@
 using System;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
 using CodeBase.Data.Runtime.ECS.Components.Tags;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Providers.Data.Balance;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
 using CodeBase.Logic.Services.Update;
 using Leopotam.EcsLite;
 using UnityEngine;
 
-namespace CodeBase.Logic.Systems.Businesses
+namespace CodeBase.Logic.Systems.Businesses.Payout
 {
     public class BusinessPayoutSystem : IDisposable
     {
@@ -19,18 +19,17 @@ namespace CodeBase.Logic.Systems.Businesses
         private readonly EcsPool<LevelParameters> _levelParametersPool;
         private readonly EcsFilter _businessFilter;
         
-        public BusinessPayoutSystem(IEcsService ecsService, IUpdateService updateService,
-            IBalanceDataProvider balanceDataProvider, IDisposerService disposerService)
+        public BusinessPayoutSystem(IServiceLocator serviceLocator)
         {
-            _balanceDataProvider = balanceDataProvider;
-            _updateService = updateService;
+            _balanceDataProvider = serviceLocator.Get<IBalanceDataProvider>();
+            _updateService = serviceLocator.Get<IUpdateService>();
+            
+            IEcsService ecsService = serviceLocator.Get<IEcsService>();
             
             _incomeParametersPool = ecsService.GetPool<IncomeParameters>();
             _levelParametersPool = ecsService.GetPool<LevelParameters>();
             
             _businessFilter = ecsService.GetFilter<BusinessTag>().Inc<IncomeParameters>().Inc<LevelParameters>().End();
-            
-            disposerService.Register(this);
             
             _updateService.OnUpdate += UpdateHandler;
         }

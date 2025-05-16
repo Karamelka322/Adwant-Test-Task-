@@ -2,13 +2,16 @@ using System.Threading.Tasks;
 using CodeBase.Data.Static.Constants;
 using CodeBase.Data.Static.Enums;
 using CodeBase.Data.Static.Models;
-using CodeBase.Logic.Providers.Data.Balance;
+using CodeBase.Logic.Infrastructure;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Providers.Data.ScriptableObjects;
 using CodeBase.Logic.Services.Addressable;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
 using CodeBase.Logic.Systems.Businesses;
+using CodeBase.Logic.Systems.Businesses.Upgrade;
+using CodeBase.UI.Elements.Business.Components;
 using CodeBase.UI.Elements.Business.Provider;
+using Leopotam.EcsLite;
 using UnityEngine;
 
 namespace CodeBase.UI.Elements.Business.Factory
@@ -20,34 +23,22 @@ namespace CodeBase.UI.Elements.Business.Factory
         private readonly IEcsService _ecsService;
         private readonly IBusinessUpgradeSystem _businessUpgradeSystem;
         private readonly IBusinessesSettingsProvider _businessesSettingsProvider;
-        private readonly IBalanceDataProvider _balanceDataProvider;
-        private readonly IBusinessBuffSystem _businessBuffSystem;
-        private readonly IDisposerService _disposerService;
+        private readonly IServiceLocator _serviceLocator;
 
-        public BusinessFactory(
-            IAddressableService addressableService,
-            IBusinessUpgradeSystem businessUpgradeSystem,
-            IBusinessEntityProvider businessEntityProvider,
-            IBusinessesSettingsProvider businessesSettingsProvider,
-            IEcsService ecsService,
-            IBalanceDataProvider balanceDataProvider,
-            IBusinessBuffSystem businessBuffSystem,
-            IDisposerService disposerService)
+        public BusinessFactory(IServiceLocator serviceLocator)
         {
-            _disposerService = disposerService;
-            _businessBuffSystem = businessBuffSystem;
-            _balanceDataProvider = balanceDataProvider;
-            _businessesSettingsProvider = businessesSettingsProvider;
-            _businessUpgradeSystem = businessUpgradeSystem;
-            _ecsService = ecsService;
-            _businessEntityProvider = businessEntityProvider;
-            _addressableService = addressableService;
+            _serviceLocator = serviceLocator;
+            _businessesSettingsProvider = serviceLocator.Get<IBusinessesSettingsProvider>();
+            _businessUpgradeSystem = serviceLocator.Get<IBusinessUpgradeSystem>();
+            _ecsService = serviceLocator.Get<IEcsService>();
+            _businessEntityProvider = serviceLocator.Get<IBusinessEntityProvider>();
+            _addressableService = serviceLocator.Get<IAddressableService>();
         }
         
-        public async Task SpawnAsync(BusinessType businessType, Transform parent)
+        public async Task<BusinessReferences> SpawnAsync(BusinessType businessType, Transform parent)
         {
-            var prefab = await _addressableService.LoadAssetAsync<GameObject>(AddressableConstants.Business);
-            var businessView = Object.Instantiate(prefab, parent).GetComponent<BusinessView>();
+            GameObject prefab = await _addressableService.LoadAssetAsync<GameObject>(AddressableConstants.Business);
+            BusinessView businessView = Object.Instantiate(prefab, parent).GetComponent<BusinessView>();
             
             string name = await _businessesSettingsProvider.GetBusinessesNameAsync(businessType);
             
@@ -59,25 +50,34 @@ namespace CodeBase.UI.Elements.Business.Factory
             
             businessView.Name.text = name;
             
-            var ecsPackedEntity = _businessEntityProvider.Provide(parameters.StartLevel,
+            EcsPackedEntity ecsPackedEntity = _businessEntityProvider.Provide(parameters.StartLevel,
                 parameters.Income, parameters.Cost, parameters.DelayedIncomeTime, businessType);
 
-            new BusinessIncomeBuffButton(businessView.FirstImprovementButton, businessView.FirstImprovementText,
-                improvements.FirstImprovement.Name, improvements.FirstImprovement.Id, improvements.FirstImprovement.Cost,
-                improvements.FirstImprovement.Multiplier, _ecsService, ecsPackedEntity,
-                _businessBuffSystem, _balanceDataProvider, _disposerService);
-
-            new BusinessIncomeBuffButton(businessView.SecondImprovementButton, businessView.SecondImprovementText,
-                improvements.SecondImprovement.Name, improvements.SecondImprovement.Id, improvements.SecondImprovement.Cost,
-                improvements.SecondImprovement.Multiplier, _ecsService, ecsPackedEntity,
-                _businessBuffSystem, _balanceDataProvider, _disposerService);
+            var firstImprovementButton = new BusinessIncomeBuffButton(businessView.FirstImprovementButton,
+                businessView.FirstImprovementText, improvements.FirstImprovement, ecsPackedEntity, _serviceLocator);
             
-            new BusinessLevelUpgradeButton(businessView.LevelUpgradeButton, businessView.LevelUpgradeText,
-                _ecsService, ecsPackedEntity, _businessUpgradeSystem, _disposerService);
+            var secondImprovementButton = new BusinessIncomeBuffButton(businessView.SecondImprovementButton,
+                businessView.SecondImprovementText, improvements.SecondImprovement, ecsPackedEntity, _serviceLocator);
             
-            new BusinessPayoutDisplay(businessView.IncomeProgressBar, _ecsService, ecsPackedEntity, _disposerService);
-            new BusinessIncomeDisplay(businessView.IncomeDisplay, _ecsService, ecsPackedEntity, _disposerService);
-            new BusinessLevelDisplay(businessView.LevelDisplay, _ecsService, ecsPackedEntity, _disposerService);
+            var levelUpgradeButton = new BusinessLevelUpgradeButton(businessView.LevelUpgradeButton,
+                businessView.LevelUpgradeText, _ecsService, ecsPackedEntity, _businessUpgradeSystem);
+            
+            var payoutDisplay = new BusinessPayoutDisplay(businessView.IncomeProgressBar, _ecsService, ecsPackedEntity);
+            var incomeDisplay = new BusinessIncomeDisplay(businessView.IncomeDisplay, _ecsService, ecsPackedEntity);
+            var levelDisplay = new BusinessLevelDisplay(businessView.LevelDisplay, _ecsService, ecsPackedEntity);
+            
+            var references = new BusinessReferences()
+            {
+                View = businessView,
+                FirstImprovementButton = firstImprovementButton,
+                SecondImprovementButton = secondImprovementButton,
+                LevelUpgradeButton = levelUpgradeButton,
+                PayoutDisplay = payoutDisplay,
+                IncomeDisplay = incomeDisplay,
+                LevelDisplay = levelDisplay,
+            };
+            
+            return references;
         }
     }
 }

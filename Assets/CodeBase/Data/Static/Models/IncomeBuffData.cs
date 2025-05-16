@@ -1,4 +1,4 @@
-namespace CodeBase.Data.Runtime.ECS.Components.Parameters
+namespace CodeBase.Data.Static.Models
 {
     public struct IncomeBuffData
     {

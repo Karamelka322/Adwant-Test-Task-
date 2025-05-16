@@ -1,13 +1,12 @@
 using System;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
 using Leopotam.EcsLite;
 using TMPro;
 using UniRx;
 using UnityEngine.UI;
 
-namespace CodeBase.UI.Elements.Business
+namespace CodeBase.UI.Elements.Business.Components
 {
     public class BusinessPayoutDisplay : IDisposable
     {
@@ -18,15 +17,12 @@ namespace CodeBase.UI.Elements.Business
         public BusinessPayoutDisplay(
             Image progressBar,
             IEcsService ecsService,
-            EcsPackedEntity ecsPackedEntity,
-            IDisposerService disposerService)
+            EcsPackedEntity ecsPackedEntity)
         {
             _progressBar = progressBar;
             
             int entity = ecsService.UnpackEntity(ecsPackedEntity);
             IncomeParameters incomeParameters = ecsService.GetPool<IncomeParameters>().Get(entity);
-            
-            disposerService.Register(this);
             
             SetPayoutProgress(incomeParameters.PayoutProgress.Value);
             

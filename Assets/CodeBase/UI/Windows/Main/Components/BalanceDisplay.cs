@@ -1,10 +1,9 @@
 using System;
 using System.Text;
 using CodeBase.Logic.Providers.Data.Balance;
-using CodeBase.Logic.Services.Disposer;
 using TMPro;
 
-namespace CodeBase.UI.Elements.Balance
+namespace CodeBase.UI.Windows.Main.Components
 {
     public class BalanceDisplay : IDisposable
     {
@@ -12,16 +11,11 @@ namespace CodeBase.UI.Elements.Balance
         private readonly TextMeshProUGUI _label;
         private readonly StringBuilder _stringBuilder;
         
-        public BalanceDisplay(
-            TextMeshProUGUI label, 
-            IBalanceDataProvider balanceDataProvider, 
-            IDisposerService disposerService)
+        public BalanceDisplay(TextMeshProUGUI label, IBalanceDataProvider balanceDataProvider)
         {
             _balanceDataProvider = balanceDataProvider;
             _label = label;
             _stringBuilder = new StringBuilder();
-            
-            disposerService.Register(this);
             
             SetBalance(_balanceDataProvider.Get());
             

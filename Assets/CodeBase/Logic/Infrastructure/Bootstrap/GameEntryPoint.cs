@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CodeBase.Logic.Infrastructure
+namespace CodeBase.Logic.Infrastructure.Bootstrap
 {
     public class GameEntryPoint : MonoBehaviour
     {

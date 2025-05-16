@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CodeBase.Data.Save;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Services.SaveLoad;
 
 namespace CodeBase.Logic.Providers.Data.Saves
@@ -9,11 +10,11 @@ namespace CodeBase.Logic.Providers.Data.Saves
         private readonly ISaveLoadService _saveLoadService;
         private readonly PlayerSaveData _playerSaveData;
 
-        public PlayerProgressDataProvider(ISaveLoadService saveLoadService)
+        public PlayerProgressDataProvider(IServiceLocator serviceLocator)
         {
-            _saveLoadService = saveLoadService;
+            _saveLoadService = serviceLocator.Get<ISaveLoadService>();
             
-            if (saveLoadService.HasSave<PlayerSaveData>() == false)
+            if (_saveLoadService.HasSave<PlayerSaveData>() == false)
             {
                 var playerSaveData = new PlayerSaveData()
                 {
@@ -21,12 +22,12 @@ namespace CodeBase.Logic.Providers.Data.Saves
                     BusinessesSaveData = new List<BusinessSaveData>()
                 };
                 
-                saveLoadService.Save(playerSaveData);
+                _saveLoadService.Save(playerSaveData);
                 _playerSaveData = playerSaveData;
             }
             else
             {
-                _playerSaveData = saveLoadService.Load<PlayerSaveData>();
+                _playerSaveData = _saveLoadService.Load<PlayerSaveData>();
             }
         }
         

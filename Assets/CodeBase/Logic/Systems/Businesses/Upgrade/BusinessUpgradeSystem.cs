@@ -1,10 +1,11 @@
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
 using CodeBase.Logic.Formulas.Business;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Providers.Data.Balance;
 using CodeBase.Logic.Services.ECS;
 using Leopotam.EcsLite;
 
-namespace CodeBase.Logic.Systems.Businesses
+namespace CodeBase.Logic.Systems.Businesses.Upgrade
 {
     public class BusinessUpgradeSystem : IBusinessUpgradeSystem
     {
@@ -15,13 +16,12 @@ namespace CodeBase.Logic.Systems.Businesses
         private readonly EcsPool<CostParameter> _costParametersPool;
         private readonly IBalanceDataProvider _balanceDataProvider;
 
-        public BusinessUpgradeSystem(
-            IEcsService ecsService, 
-            IBusinessFormulas  businessFormulas,
-            IBalanceDataProvider balanceDataProvider)
+        public BusinessUpgradeSystem(IServiceLocator serviceLocator)
         {
-            _balanceDataProvider = balanceDataProvider;
-            _businessFormulas = businessFormulas;
+            _balanceDataProvider = serviceLocator.Get<IBalanceDataProvider>();
+            _businessFormulas = serviceLocator.Get<IBusinessFormulas>();
+            
+            IEcsService ecsService = serviceLocator.Get<IEcsService>();
             
             _levelParametersPool = ecsService.GetPool<LevelParameters>();
             _incomeParametersPool = ecsService.GetPool<IncomeParameters>();
@@ -48,7 +48,7 @@ namespace CodeBase.Logic.Systems.Businesses
             ref LevelParameters businessParameters = ref _levelParametersPool.Get(entity);
             businessParameters.Level.Value = level;
             
-            var businessCost = _costParametersPool.Get(entity).Cost.Value;
+            int businessCost = _costParametersPool.Get(entity).Cost.Value;
             
             businessParameters.UpgradeCost.Value = _businessFormulas.GetUpgradeLevelCost(
                 businessParameters.Level.Value, businessCost);

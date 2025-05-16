@@ -1,7 +1,11 @@
+using CodeBase.Data.Runtime.ECS.Components.Buffs;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
 using CodeBase.Data.Runtime.ECS.Components.Tags;
 using CodeBase.Data.Static.Enums;
+using CodeBase.Data.Static.Models;
 using CodeBase.Logic.Formulas.Business;
+using CodeBase.Logic.Infrastructure;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Services.ECS;
 using Leopotam.EcsLite;
 using UniRx;
@@ -13,10 +17,10 @@ namespace CodeBase.UI.Elements.Business.Provider
         private readonly IEcsService _ecsService;
         private readonly IBusinessFormulas _businessFormulas;
 
-        public BusinessEntityProvider(IEcsService ecsService, IBusinessFormulas businessFormulas)
+        public BusinessEntityProvider(IServiceLocator serviceLocator)
         {
-            _businessFormulas = businessFormulas;
-            _ecsService = ecsService;
+            _businessFormulas = serviceLocator.Get<IBusinessFormulas>();
+            _ecsService = serviceLocator.Get<IEcsService>();
         }
         
         public EcsPackedEntity Provide(int level, int income, int cost, int payoutDelay, BusinessType type)

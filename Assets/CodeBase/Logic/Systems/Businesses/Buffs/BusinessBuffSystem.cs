@@ -1,11 +1,13 @@
-using System.Collections.Generic;
+using CodeBase.Data.Runtime.ECS.Components.Buffs;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
+using CodeBase.Data.Static.Models;
 using CodeBase.Logic.Formulas.Business;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Services.ECS;
 using Leopotam.EcsLite;
 using UniRx;
 
-namespace CodeBase.Logic.Systems.Businesses
+namespace CodeBase.Logic.Systems.Businesses.Buffs
 {
     public class BusinessBuffSystem : IBusinessBuffSystem
     {
@@ -14,9 +16,11 @@ namespace CodeBase.Logic.Systems.Businesses
         private readonly EcsPool<IncomeBuffs> _incomeBuffBufferPool;
         private readonly EcsPool<IncomeParameters> _incomeParametersPool;
 
-        public BusinessBuffSystem(IEcsService ecsService, IBusinessFormulas businessFormulas)
+        public BusinessBuffSystem(IServiceLocator serviceLocator)
         {
-            _businessFormulas = businessFormulas;
+            _businessFormulas = serviceLocator.Get<IBusinessFormulas>();
+            
+            IEcsService ecsService = serviceLocator.Get<IEcsService>();
             
             _incomeParametersPool = ecsService.GetPool<IncomeParameters>();
             _incomeBuffBufferPool = ecsService.GetPool<IncomeBuffs>();
@@ -26,7 +30,7 @@ namespace CodeBase.Logic.Systems.Businesses
         {
             if (_incomeBuffBufferPool.Has(entity) == false)
             {
-                ref var incomeBuffs = ref _incomeBuffBufferPool.Add(entity);
+                ref IncomeBuffs incomeBuffs = ref _incomeBuffBufferPool.Add(entity);
                 incomeBuffs.Buffs = new ReactiveCollection<IncomeBuffData>();
             }
             
@@ -35,7 +39,7 @@ namespace CodeBase.Logic.Systems.Businesses
                 return;
             }
             
-            IncomeBuffData buffData = new IncomeBuffData()
+            var buffData = new IncomeBuffData()
             {
                 Id = id,
                 Multiply = multiply
@@ -52,7 +56,7 @@ namespace CodeBase.Logic.Systems.Businesses
                 return false;
             }
             
-            foreach (var buffData in _incomeBuffBufferPool.Get(entity).Buffs)
+            foreach (IncomeBuffData buffData in _incomeBuffBufferPool.Get(entity).Buffs)
             {
                 if (buffData.Id == id)
                 {

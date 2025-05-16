@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace CodeBase.Logic.Services.Addressable
 {
@@ -7,7 +8,8 @@ namespace CodeBase.Logic.Services.Addressable
     {
         public async Task<TObject> LoadAssetAsync<TObject>(string key) where TObject : Object
         {
-            var loadAssetAsync = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<TObject>(key);
+            AsyncOperationHandle<TObject> loadAssetAsync = UnityEngine.AddressableAssets
+                .Addressables.LoadAssetAsync<TObject>(key);
             
             await loadAssetAsync.Task;
             

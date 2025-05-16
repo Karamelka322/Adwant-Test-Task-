@@ -3,6 +3,8 @@ using CodeBase.Data.Static.Constants;
 using CodeBase.Data.Static.Enums;
 using CodeBase.Data.Static.Models;
 using CodeBase.Data.Static.ScriptableObjects;
+using CodeBase.Logic.Infrastructure;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Services.Addressable;
 
 namespace CodeBase.Logic.Providers.Data.ScriptableObjects
@@ -11,9 +13,9 @@ namespace CodeBase.Logic.Providers.Data.ScriptableObjects
     {
         private readonly IAddressableService _addressableService;
 
-        public BusinessesSettingsProvider(IAddressableService addressableService)
+        public BusinessesSettingsProvider(IServiceLocator serviceLocator)
         {
-            _addressableService = addressableService;
+            _addressableService = serviceLocator.Get<IAddressableService>();
         }
         
         public async Task<string> GetBusinessesNameAsync(BusinessType businessType)

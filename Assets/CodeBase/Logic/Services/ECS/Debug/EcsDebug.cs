@@ -30,23 +30,23 @@ namespace CodeBase.Logic.Services.ECS.Debug
         /// Обработка события добавления новой сущности
         public void OnEntityCreated(int entity)
         {
-            var entityObject = CreateDebugObject(entity.ToString(), _entitiesParent.transform);
+            GameObject entityObject = CreateDebugObject(entity.ToString(), _entitiesParent.transform);
             
-            var debug = entityObject.gameObject.AddComponent<EcsEntityDebug>();
+            EcsEntityDebug debug = entityObject.gameObject.AddComponent<EcsEntityDebug>();
             debug.Initialize(entity);
             
             _entities.Add(entity, entityObject);
         }
         
         /// Обработка события изменения сущности в ecs пулах
-        public async void OnEntityChanged(int entity, short poolId, bool added)
+        public void OnEntityChanged(int entity, short poolId, bool added)
         {
             if (_entities.ContainsKey(entity) == false || _entities[entity] == null)
             {
                 return;
             }
 
-            var pool = _world.GetPoolById(poolId);
+            IEcsPool pool = _world.GetPoolById(poolId);
             
             if (added)
             {
@@ -55,7 +55,7 @@ namespace CodeBase.Logic.Services.ECS.Debug
             }
             else
             {
-                var components = _entities[entity].GetComponents<EcsComponentDebug>();
+                EcsComponentDebug[] components = _entities[entity].GetComponents<EcsComponentDebug>();
 
                 for (int i = 0; i < components.Length; i++)
                 {
@@ -88,7 +88,7 @@ namespace CodeBase.Logic.Services.ECS.Debug
 
         private GameObject CreateWorldObject()
         {
-            var world = CreateDebugObject("ECS");
+            GameObject world = CreateDebugObject("ECS");
             Object.DontDestroyOnLoad(world);
 
             return world;
@@ -97,7 +97,7 @@ namespace CodeBase.Logic.Services.ECS.Debug
         /// Создать отладочный обьект
         private static GameObject CreateDebugObject(string name, Transform parent = null)
         {
-            GameObject obj = new GameObject(name)
+            var obj = new GameObject(name)
             {
                 hideFlags = HideFlags.NotEditable,
             

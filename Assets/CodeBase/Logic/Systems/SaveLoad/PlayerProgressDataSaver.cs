@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using CodeBase.Data.Runtime.ECS.Components.Buffs;
 using CodeBase.Data.Runtime.ECS.Components.Parameters;
 using CodeBase.Data.Runtime.ECS.Components.Tags;
 using CodeBase.Data.Save;
+using CodeBase.Logic.Infrastructure.Container;
 using CodeBase.Logic.Providers.Data.Balance;
 using CodeBase.Logic.Providers.Data.Saves;
-using CodeBase.Logic.Services.Disposer;
 using CodeBase.Logic.Services.ECS;
 using UnityEngine;
 
-namespace CodeBase.Logic.Systems
+namespace CodeBase.Logic.Systems.SaveLoad
 {
     public class PlayerProgressDataSaver : IDisposable
     {
@@ -17,33 +18,32 @@ namespace CodeBase.Logic.Systems
         private readonly IBalanceDataProvider _balanceDataProvider;
         private readonly IEcsService _ecsService;
 
-        public PlayerProgressDataSaver(
-            IDisposerService disposerService,
-            IPlayerProgressDataProvider playerSaveDataProvider,
-            IBalanceDataProvider balanceDataProvider,
-            IEcsService ecsService)
+        public PlayerProgressDataSaver(IServiceLocator serviceLocator)
         {
-            _playerSaveDataProvider = playerSaveDataProvider;
-            _ecsService = ecsService;
-            _balanceDataProvider = balanceDataProvider;
+            _playerSaveDataProvider = serviceLocator.Get<IPlayerProgressDataProvider>();
+            _ecsService = serviceLocator.Get<IEcsService>();
+            _balanceDataProvider = serviceLocator.Get<IBalanceDataProvider>();
             
-            disposerService.Register(this);
-            
-            Application.focusChanged += OnFocusChanged;
+            Application.focusChanged += OnApplicationFocusChanged;
+            Application.quitting += OnApplicationQuitting;
         }
         
         public void Dispose()
         {
-            Application.focusChanged -= OnFocusChanged;
+            Application.focusChanged -= OnApplicationFocusChanged;
+            Application.quitting -= OnApplicationQuitting;
         }
         
-        private void OnFocusChanged(bool hasFocus)
+        private void OnApplicationFocusChanged(bool hasFocus)
         {
-            if (hasFocus)
+            if (hasFocus == false)
             {
-                return;
+                Save();
             }
-            
+        }
+        
+        private void OnApplicationQuitting()
+        {
             Save();
         }
         
